@@ -32,6 +32,8 @@ async function run() {
     await client.connect();
     const userCollection = client.db('forumDB').collection('users')
     const postCollection = client.db('forumDB').collection('post')
+    const commentCollection = client.db('forumDB').collection('comment')
+    const announcementCollection = client.db('forumDB').collection('announcement')
 
     // jwt related api
 
@@ -57,14 +59,35 @@ async function run() {
       })
       
     }
-    app.get('/post', async (req, res) => {
-      const result = await postCollection.find().toArray()
+    // app.get('/post', async (req, res) => {
+    //   const result = await postCollection.find().toArray()
+    //   res.send(result)
+    // })
+    app.get('/post', async(req,res)=>{
+      let query = {}
+      const email = req.query.email
+      if(email){
+        query = {email: email}
+      }
+      
+      const result = await postCollection.find(query).toArray()
+      res.send(result)
+    })
+    app.get('/comment', async (req, res) => {
+      const result = await commentCollection.find().toArray()
       res.send(result)
     })
     app.get('/users', async (req, res) => {
       const result = await userCollection.find().toArray()
       res.send(result)
     })
+
+    // app.get('/users', async(req,res)=>{
+    //   const email = req.query.email
+    //   const query = {email: email}
+    //   const result = await userCollection.find(query).toArray()
+    //   res.send(result)
+    // })
 
     app.get('/post/:id', async (req, res) => {
       const id = req.params.id
@@ -103,6 +126,12 @@ async function run() {
       const newPost = req.body
       console.log(newPost)
       const result = await postCollection.insertOne(newPost)
+      res.send(result)
+    })
+    app.post('/comment', async (req, res) => {
+      const newComment = req.body
+      console.log(newComment)
+      const result = await commentCollection.insertOne(newComment)
       res.send(result)
     })
     app.delete('/users/:id', async (req, res) => {
