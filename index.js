@@ -73,12 +73,23 @@ async function run() {
       const result = await postCollection.find(query).toArray()
       res.send(result)
     })
+
+    
     app.get('/comment', async (req, res) => {
       const result = await commentCollection.find().toArray()
       res.send(result)
     })
+    app.get('/announcement', async (req, res) => {
+      const result = await announcementCollection.find().toArray()
+      res.send(result)
+    })
     app.get('/users', async (req, res) => {
-      const result = await userCollection.find().toArray()
+      let query = {}
+      const email = req.query.email
+      if(email){
+        query = {email: email}
+      }
+      const result = await userCollection.find(query).toArray()
       res.send(result)
     })
 
@@ -128,6 +139,12 @@ async function run() {
       const result = await postCollection.insertOne(newPost)
       res.send(result)
     })
+    app.post('/announcement', async (req, res) => {
+      const newPost = req.body
+      console.log(newPost)
+      const result = await announcementCollection.insertOne(newPost)
+      res.send(result)
+    })
     app.post('/comment', async (req, res) => {
       const newComment = req.body
       console.log(newComment)
@@ -138,6 +155,12 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }
       const result = await userCollection.deleteOne(query)
+      res.send(result)
+    })
+    app.delete('/comment/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await commentCollection.deleteOne(query)
       res.send(result)
     })
 
@@ -183,3 +206,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`final assignment is running on port ${port}`)
 })
+
+
