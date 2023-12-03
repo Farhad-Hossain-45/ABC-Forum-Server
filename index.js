@@ -29,7 +29,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const userCollection = client.db('forumDB').collection('users')
     const postCollection = client.db('forumDB').collection('post')
     const commentCollection = client.db('forumDB').collection('comment')
@@ -63,19 +63,35 @@ async function run() {
     //   const result = await postCollection.find().toArray()
     //   res.send(result)
     // })
-    app.get('/post', async(req,res)=>{
-      let query = {}
-      const email = req.query.email
-      if(email){
-        query = {email: email}
-      }
+    // app.get('/post', async(req,res)=>{
+    //   let query = {}
+    //   const email = req.query.email
+    //   if(email){
+    //     query = {email: email}
+    //   }
       
-      const result = await postCollection.find(query).toArray()
-      res.send(result)
-    })
+    //   const result = await postCollection.find(query).toArray()
+    //   res.send(result)
+    // })
 
+    app.get('/post', async (req, res) => {
+      let query = {};
+      const email = req.query.email;
+      
+      if (email) {
+        query = { email: email };
+      }
+    
+      const result = await postCollection.find(query).sort({ time: -1 }).toArray();
+      res.send(result);
+    });
     
     app.get('/comment', async (req, res) => {
+      // let query = {}
+      // const title = req.query.title
+      // if(title){
+      //   query = { title}
+      // }
       const result = await commentCollection.find().toArray()
       res.send(result)
     })
@@ -106,6 +122,12 @@ async function run() {
       const result = await postCollection.findOne(query)
       res.send(result)
     })
+    // app.get('/comment/:title', async (req, res) => {
+    //   const title = req.params.title
+    //   const query = { title: new ObjectId() }
+    //   const result = await postCollection.findOne(query)
+    //   res.send(result)
+    // })
 
     app.get('/users/admin/:email', async(req,res)=>{
       const email = req.params.email
@@ -176,6 +198,28 @@ async function run() {
       res.send(result)
     })
 
+    // upvote and downvote patch
+    app.patch('/post/upvote/:id', async(req,res)=>{
+      const item = req.body
+      const id = req.params.id
+      const filter = {_id: new ObjectId(id)}
+      const update = {
+        $inc:{upVote: 1}
+      }
+      const result = await postCollection.updateOne(filter,update)
+      res.send(result)
+    })
+    app.patch('/post/downvote/:id', async(req,res)=>{
+      const item = req.body
+      const id = req.params.id
+      const filter = {_id: new ObjectId(id)}
+      const update = {
+        $inc:{downVote: 1}
+      }
+      const result = await postCollection.updateOne(filter,update)
+      res.send(result)
+    })
+
   app.post("/create-payment-intent", async (req, res) =>{
     const {price} = req.body;
     const amount = parseInt(price * 100);
@@ -189,7 +233,7 @@ async function run() {
     });
   })
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
