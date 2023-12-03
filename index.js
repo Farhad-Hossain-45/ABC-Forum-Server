@@ -37,28 +37,28 @@ async function run() {
 
     // jwt related api
 
-    app.post('/jwt', async (req, res) => {
-      const user = req.body;
-      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
-      res.send({ token })
-    })
+    // app.post('/jwt', async (req, res) => {
+    //   const user = req.body;
+    //   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+    //   res.send({ token })
+    // })
     // custom middleware
-    const verifyToken = (req,res,next)=>{
-      console.log('inside verify token', req.headers.authorization)
-      if(!req.headers. authorization){
-        return res.status(401).send({message: 'forbidden access'})
-      }
-      const token = req.headers.authorization.split(' ')[1]
-      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded)=>{
-        if(err){
-          return res.status(401).send({message: 'forbidden access'})
-        }
-        req.decoded = decoded
-        next()
+    // const verifyToken = (req,res,next)=>{
+    //   console.log('inside verify token', req.headers.authorization)
+    //   if(!req.headers. authorization){
+    //     return res.status(401).send({message: 'forbidden access'})
+    //   }
+    //   const token = req.headers.authorization.split(' ')[1]
+    //   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded)=>{
+    //     if(err){
+    //       return res.status(401).send({message: 'forbidden access'})
+    //     }
+    //     req.decoded = decoded
+    //     next()
     
-      })
+    //   })
       
-    }
+    // }
     // app.get('/post', async (req, res) => {
     //   const result = await postCollection.find().toArray()
     //   res.send(result)
